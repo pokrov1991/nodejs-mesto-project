@@ -13,5 +13,5 @@ export const handleError = (res: Response, err: ErrorType | false, message: stri
   if (['ValidationError', 'CastError'].includes(err.name)) {
     return res.status(ERROR_VALIDATION_CODE).send({ message: `${message}: ${err.message}` });
   }
-  return res.status(ERROR_DEFAULT_CODE).send({ message: `Ошибка запроса: ${err.message}` });
+  return res.status(ERROR_DEFAULT_CODE).send({ message: 'На сервере произошла ошибка' });
 };
