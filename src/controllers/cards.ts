@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { handleError } from '../utils';
+import { handleError, handleUpdateById } from '../utils';
 import Card from '../models/card';
 
 export const createCard = (req: Request, res: Response) => {
@@ -28,31 +28,23 @@ export const deleteCard = (req: Request, res: Response) => {
 };
 
 export const updateLike = (req: Request, res: Response) => {
-  Card.findByIdAndUpdate(
+  handleUpdateById(
+    res,
+    Card,
     req.params.id,
     { $addToSet: { likes: req.user._id } },
-    { new: true },
-  )
-    .then((card) => {
-      if (!card) {
-        return handleError(res, false, 'Лайк не поставлен. Карточка не найдена');
-      }
-      return res.send({ data: card });
-    })
-    .catch((err) => handleError(res, err, 'Лайк не поставлен. Не валидный id карточки'));
+    'Данные для установки лайка неверные',
+    'Лайк не поставлен. Карточка не найдена',
+  );
 };
 
 export const deleteLike = (req: Request, res: Response) => {
-  Card.findByIdAndUpdate(
+  handleUpdateById(
+    res,
+    Card,
     req.params.id,
     { $pull: { likes: req.user._id } },
-    { new: true },
-  )
-    .then((card) => {
-      if (!card) {
-        return handleError(res, false, 'Лайк не удален. Карточка не найдена');
-      }
-      return res.send({ data: card });
-    })
-    .catch((err) => handleError(res, err, 'Лайк не удален. Не валидный id карточки'));
+    'Данные для удаления лайка неверные',
+    'Лайк не удален. Карточка не найдена',
+  );
 };
