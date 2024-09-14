@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { handleError } from '../utils';
+import { handleError, handleUpdateById } from '../utils';
 import User from '../models/user';
 
 export const createUser = (req: Request, res: Response) => {
@@ -30,25 +30,25 @@ export const getUser = (req: Request, res: Response) => {
 export const updateUser = (req: Request, res: Response) => {
   const { name, about } = req.body;
 
-  User.findByIdAndUpdate(
+  handleUpdateById(
+    res,
+    User,
     req.user._id,
     { name, about },
-    { new: true },
-  )
-    .then((user) => res.send({ data: user }))
-    .catch((err) => handleError(res, err, 'Данные для обновления пользователя неверные'));
+    'Данные для обновления пользователя неверные',
+    'Данные не обновлены. Пользователь не найден',
+  );
 };
 
 export const updateAvatar = (req: Request, res: Response) => {
   const { avatar } = req.body;
 
-  User.findByIdAndUpdate(
+  handleUpdateById(
+    res,
+    User,
     req.user._id,
     { avatar },
-    {
-      new: true,
-    },
-  )
-    .then((user) => res.send({ data: user }))
-    .catch((err) => handleError(res, err, 'Данные для обновления аватара неверные'));
+    'Данные для обновления аватара неверные',
+    'Аватар не обновлен. Пользователь не найден',
+  );
 };
