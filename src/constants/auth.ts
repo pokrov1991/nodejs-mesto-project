@@ -1,0 +1,1 @@
+export const EXPIRES_SECONDS = 604800;

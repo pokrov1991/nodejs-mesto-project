@@ -1,28 +1,68 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
+import { isEmail } from 'validator';
 
 interface IUser {
   name: string;
   about: string;
   avatar: string;
+  email: string;
+  password: string;
 }
 
-const userSchema = new mongoose.Schema<IUser>({
+interface IUserModel extends mongoose.Model<IUser> {
+  findUserByCredentials: (
+    // eslint-disable-next-line no-unused-vars
+    email: string, password: string
+  ) => Promise<mongoose.Document<unknown, any, IUser>>
+}
+
+const userSchema = new mongoose.Schema<IUser, IUserModel>({
   name: {
     type: String,
     minLength: 2,
     maxLength: 30,
-    required: true,
+    default: 'Жак-Ив Кусто',
   },
   about: {
     type: String,
     minLength: 2,
     maxLength: 200,
-    required: true,
+    default: 'Исследователь',
   },
   avatar: {
     type: String,
+    default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+  },
+  email: {
+    type: String,
     required: true,
+    unique: true,
+    validate: isEmail,
+  },
+  password: {
+    type: String,
+    required: true,
+    // select: false, // TODO - ?
   },
 });
 
-export default mongoose.model('user', userSchema);
+userSchema.static('findUserByCredentials', function findUserByCredentials(email: string, password: string) {
+  return this.findOne({ email })
+    .then((user) => {
+      if (!user) {
+        return Promise.reject(new Error('Неправильные почта или пароль'));
+      }
+
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            return Promise.reject(new Error('Неправильные почта или пароль'));
+          }
+
+          return user;
+        });
+    });
+});
+
+export default mongoose.model<IUser, IUserModel>('user', userSchema);
