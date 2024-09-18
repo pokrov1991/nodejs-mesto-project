@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
+import AuthorizationError from '../errors/authorization';
 
 require('dotenv').config();
 
@@ -10,9 +11,7 @@ export default (req: Request, res: Response, next: NextFunction) => {
   const { token } = req.cookies;
 
   if (!token) {
-    return res
-      .status(401)
-      .send({ message: 'Необходима авторизация' }); // TODO - 401
+    return next(new AuthorizationError('Необходима авторизация'));
   }
 
   let payload;
@@ -20,9 +19,7 @@ export default (req: Request, res: Response, next: NextFunction) => {
   try {
     payload = jwt.verify(token, JWT_SECRET_KEY);
   } catch (err) {
-    return res
-      .status(401)
-      .send({ message: 'Необходима авторизация' }); // TODO - 401
+    return next(new AuthorizationError('Необходима авторизация'));
   }
 
   req.user = payload;
