@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { isEmail } from 'validator';
+import { isEmail, isURL } from 'validator';
 import AuthorizationError from '../errors/authorization';
 
 interface IUser {
@@ -34,6 +34,7 @@ const userSchema = new mongoose.Schema<IUser, IUserModel>({
   avatar: {
     type: String,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+    validate: isURL,
   },
   email: {
     type: String,

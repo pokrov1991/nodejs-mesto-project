@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
+import { errors } from 'celebrate';
 import routerAuth from './routes/auth';
 import routerUser from './routes/users';
 import routerCard from './routes/cards';
@@ -34,6 +35,10 @@ app.use('/cards', routerCard);
 
 app.use(errorLogger);
 
+// Обработчик ошибок валидации celebrate
+app.use(errors());
+
+// Централизованный обработчик ошибок
 app.use(handleError);
 
 app.listen(PORT, () => {

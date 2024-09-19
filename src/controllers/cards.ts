@@ -24,7 +24,7 @@ export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
         return next(new NotFoundError('Запрашиваемая карточка не найдена'));
       }
 
-      if (card.owner.toString() !== req.body.user._id) {
+      if (card.owner.toString() !== req.user._id) {
         return next(new ConflictError('Запрашиваемую карточка удалить нельзя'));
       }
 
