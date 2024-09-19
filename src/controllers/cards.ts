@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { handleUpdateById } from '../utils';
-import { ConflictError, NotFoundError, ValidationError } from '../errors';
+import { ForbiddenError, NotFoundError, ValidationError } from '../errors';
 import Card from '../models/card';
 
 export const createCard = (req: Request, res: Response, next: NextFunction) => {
@@ -25,7 +25,7 @@ export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
       }
 
       if (card.owner.toString() !== req.user._id) {
-        return next(new ConflictError('Запрашиваемую карточка удалить нельзя'));
+        return next(new ForbiddenError('Запрашиваемую карточка удалить нельзя'));
       }
 
       return res.send({ data: card });
