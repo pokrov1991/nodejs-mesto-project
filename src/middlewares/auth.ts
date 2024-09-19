@@ -4,9 +4,8 @@ import AuthorizationError from '../errors/authorization';
 
 require('dotenv').config();
 
-const { JWT_SECRET_KEY = '' } = process.env;
+const { JWT_SECRET_KEY = 'nostromo' } = process.env;
 
-// eslint-disable-next-line consistent-return
 export default (req: Request, res: Response, next: NextFunction) => {
   const { token } = req.cookies;
 

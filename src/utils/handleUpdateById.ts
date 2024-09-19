@@ -14,7 +14,7 @@ export const handleUpdateById = <T extends mongoose.Document>(
   model.findByIdAndUpdate(
     id,
     params,
-    { new: true },
+    { new: true, runValidators: true },
   )
     .then((data: any) => {
       if (!data) {
@@ -22,5 +22,10 @@ export const handleUpdateById = <T extends mongoose.Document>(
       }
       return res.send({ data });
     })
-    .catch(() => next(new ValidationError(messageError)));
+    .catch((err: { name: string; }) => {
+      if (err.name === 'ValidaitonError') {
+        return next(new ValidationError(messageError));
+      }
+      return next(err);
+    });
 };
