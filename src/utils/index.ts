@@ -1,4 +1,4 @@
-import { handleError } from './handleError';
+import handleError from './handleError';
 import { handleUpdateById } from './handleUpdateById';
 
 export {

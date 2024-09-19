@@ -1,14 +1,10 @@
 import mongoose, { Model } from 'mongoose';
-import { Response } from 'express';
-import { handleError } from './handleError';
-
-interface ErrorType extends Error {
-  name: 'ValidationError' | 'CastError' | string;
-  message: string;
-}
+import { Response, NextFunction } from 'express';
+import { NotFoundError, ValidationError } from '../errors';
 
 export const handleUpdateById = <T extends mongoose.Document>(
   res: Response,
+  next: NextFunction,
   model: Model<T> | any,
   id: mongoose.Types.ObjectId | string,
   params: object,
@@ -22,9 +18,9 @@ export const handleUpdateById = <T extends mongoose.Document>(
   )
     .then((data: any) => {
       if (!data) {
-        return handleError(res, false, messageNotFound);
+        return next(new NotFoundError(messageNotFound));
       }
       return res.send({ data });
     })
-    .catch((err: ErrorType) => handleError(res, err, messageError));
+    .catch(() => next(new ValidationError(messageError)));
 };

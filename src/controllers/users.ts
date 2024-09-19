@@ -1,37 +1,88 @@
-import { Request, Response } from 'express';
-import { handleError, handleUpdateById } from '../utils';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { Request, Response, NextFunction } from 'express';
+import { handleUpdateById } from '../utils';
+import { EXPIRES_SECONDS } from '../constants/auth';
+import {
+  ConflictError, DefaultError, NotFoundError, ValidationError,
+} from '../errors';
 import User from '../models/user';
 
-export const createUser = (req: Request, res: Response) => {
-  const { name, about, avatar } = req.body;
+require('dotenv').config();
 
-  return User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => handleError(res, err, 'Данные для создания пользователя неверные'));
+const { JWT_SECRET_KEY = '' } = process.env;
+
+export const login = (req: Request, res: Response, next: NextFunction) => {
+  const { email, password } = req.body;
+
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET_KEY, { expiresIn: EXPIRES_SECONDS });
+
+      res
+        .cookie('token', token, { maxAge: EXPIRES_SECONDS, httpOnly: true })
+        .send({ token });
+    })
+    .catch(next);
 };
 
-export const getUsers = (req: Request, res: Response) => {
+export const createUser = (req: Request, res: Response, next: NextFunction) => {
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
+    .then((user) => res.send({ data: user }))
+    .catch((err) => {
+      if (err.code === 11000) {
+        return next(new ConflictError('Пользователь с данной почтой уже существует'));
+      }
+
+      return next(new DefaultError('Данные для создания пользователя неверные'));
+    });
+};
+
+export const getUsers = (req: Request, res: Response, next: NextFunction) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch((err) => handleError(res, err));
+    .catch(next);
 };
 
-export const getUser = (req: Request, res: Response) => {
+export const getUser = (req: Request, res: Response, next: NextFunction) => {
   User.findById(req.params.id)
     .then((user) => {
       if (!user) {
-        return handleError(res, false, 'Запрашиваемый пользователь не найден');
+        return next(new NotFoundError('Запрашиваемый пользователь не найден'));
       }
       return res.send({ data: user });
     })
-    .catch((err) => handleError(res, err, 'Не валидный id пользователя'));
+    .catch(() => next(new ValidationError('Не валидный id пользователя')));
 };
 
-export const updateUser = (req: Request, res: Response) => {
+export const getUserMe = (req: Request, res: Response, next: NextFunction) => {
+  User.findById(req.user._id)
+    .then((user) => {
+      if (!user) {
+        return next(new NotFoundError('Запрашиваемый пользователь не найден'));
+      }
+      return res.send({ data: user });
+    })
+    .catch(() => next(new ValidationError('Не валидный id пользователя')));
+};
+
+export const updateUser = (req: Request, res: Response, next: NextFunction) => {
   const { name, about } = req.body;
 
   handleUpdateById(
     res,
+    next,
     User,
     req.user._id,
     { name, about },
@@ -40,11 +91,12 @@ export const updateUser = (req: Request, res: Response) => {
   );
 };
 
-export const updateAvatar = (req: Request, res: Response) => {
+export const updateAvatar = (req: Request, res: Response, next: NextFunction) => {
   const { avatar } = req.body;
 
   handleUpdateById(
     res,
+    next,
     User,
     req.user._id,
     { avatar },
