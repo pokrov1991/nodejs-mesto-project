@@ -5,13 +5,13 @@ import { errors } from 'celebrate';
 import routerAuth from './routes/auth';
 import routerUser from './routes/users';
 import routerCard from './routes/cards';
-import handleError from './utils/handleError';
+import error from './middlewares/error';
 import auth from './middlewares/auth';
 import { requestLogger, errorLogger } from './middlewares/logger';
 
 require('dotenv').config();
 
-const { PORT = 3000, MONGODB_URL } = process.env;
+const { PORT = 3000, MONGODB_URL = 'mongodb://localhost:27017/mestodb' } = process.env;
 
 const app = express();
 
@@ -39,7 +39,7 @@ app.use(errorLogger);
 app.use(errors());
 
 // Централизованный обработчик ошибок
-app.use(handleError);
+app.use(error);
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
