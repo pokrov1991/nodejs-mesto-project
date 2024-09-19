@@ -66,17 +66,7 @@ export const GET_CARDS = {
   cookies,
 };
 
-export const DELETE_CARD = {
-  cookies,
-  params,
-};
-
-export const UPDATE_LIKE = {
-  cookies,
-  params,
-};
-
-export const DELETE_LIKE = {
+export const CARD_ID = {
   cookies,
   params,
 };
