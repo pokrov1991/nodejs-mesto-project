@@ -3,14 +3,12 @@ import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { handleUpdateById } from '../utils';
 import { EXPIRES_SECONDS } from '../constants/auth';
-import {
-  ConflictError, DefaultError, NotFoundError, ValidationError,
-} from '../errors';
+import { ConflictError, NotFoundError, ValidationError } from '../errors';
 import User from '../models/user';
 
 require('dotenv').config();
 
-const { JWT_SECRET_KEY = '' } = process.env;
+const { JWT_SECRET_KEY = 'nostromo' } = process.env;
 
 export const login = (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
@@ -39,13 +37,19 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
       email,
       password: hash,
     }))
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      const objUser = user.toObject();
+      Reflect.deleteProperty(objUser, 'password');
+      return res.status(201).send({ data: objUser });
+    })
     .catch((err) => {
       if (err.code === 11000) {
         return next(new ConflictError('Пользователь с данной почтой уже существует'));
       }
-
-      return next(new DefaultError('Данные для создания пользователя неверные'));
+      if (err.name === 'ValidaitonError') {
+        return next(new ValidationError('Данные для создания пользователя неверные'));
+      }
+      return next(err);
     });
 };
 
@@ -63,7 +67,12 @@ export const getUser = (req: Request, res: Response, next: NextFunction) => {
       }
       return res.send({ data: user });
     })
-    .catch(() => next(new ValidationError('Не валидный id пользователя')));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return next(new ValidationError('Не валидный id пользователя'));
+      }
+      return next(err);
+    });
 };
 
 export const getUserMe = (req: Request, res: Response, next: NextFunction) => {
@@ -74,7 +83,12 @@ export const getUserMe = (req: Request, res: Response, next: NextFunction) => {
       }
       return res.send({ data: user });
     })
-    .catch(() => next(new ValidationError('Не валидный id пользователя')));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return next(new ValidationError('Не валидный id пользователя'));
+      }
+      return next(err);
+    });
 };
 
 export const updateUser = (req: Request, res: Response, next: NextFunction) => {

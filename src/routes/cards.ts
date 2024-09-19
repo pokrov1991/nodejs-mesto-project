@@ -4,14 +4,14 @@ import {
   createCard, getCards, deleteCard, updateLike, deleteLike,
 } from '../controllers/cards';
 import {
-  CREATE_CARD, GET_CARDS, DELETE_CARD, UPDATE_LIKE, DELETE_LIKE,
+  CREATE_CARD, DELETE_CARD, UPDATE_LIKE, DELETE_LIKE,
 } from '../constants/joi-schemas';
 
 const router = Router();
 
 router.post('/', celebrate(CREATE_CARD), createCard);
 
-router.get('/', celebrate(GET_CARDS), getCards);
+router.get('/', getCards);
 
 router.delete('/:id', celebrate(DELETE_CARD), deleteCard);
 

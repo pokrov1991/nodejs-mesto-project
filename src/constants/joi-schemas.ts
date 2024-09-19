@@ -5,6 +5,9 @@ const cookies = Joi.object()
     token: Joi.string().required(),
   })
   .unknown(true);
+const params = {
+  id: Joi.string().alphanum().length(24).required(),
+};
 
 export const LOGIN = {
   body: Joi.object().keys({
@@ -48,41 +51,32 @@ export const UPDATE_AVATAR = {
 
 export const GET_USER = {
   cookies,
-  params: {
-    id: Joi.string().alphanum().length(24).required(),
-  },
+  params,
 };
 
 export const CREATE_CARD = {
   cookies,
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    link: Joi.string().uri().required(),
+  }),
 };
 
 export const GET_CARDS = {
   cookies,
-  body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    link: Joi.string().uri().required(),
-    user: Joi.object(),
-  }),
 };
 
 export const DELETE_CARD = {
   cookies,
-  params: {
-    id: Joi.string().alphanum().length(24).required(),
-  },
+  params,
 };
 
 export const UPDATE_LIKE = {
   cookies,
-  params: {
-    id: Joi.string().alphanum().length(24).required(),
-  },
+  params,
 };
 
 export const DELETE_LIKE = {
   cookies,
-  params: {
-    id: Joi.string().alphanum().length(24).required(),
-  },
+  params,
 };

@@ -7,8 +7,13 @@ export const createCard = (req: Request, res: Response, next: NextFunction) => {
   const { name, link } = req.body;
 
   return Card.create({ name, link, owner: req.user._id })
-    .then((card) => res.send({ data: card }))
-    .catch(() => next(new ValidationError('Данные для создания карточки неверные')));
+    .then((card) => res.status(201).send({ data: card }))
+    .catch((err) => {
+      if (err.name === 'ValidaitonError') {
+        return next(new ValidationError('Данные для создания карточки неверные'));
+      }
+      return next(err);
+    });
 };
 
 export const getCards = (req: Request, res: Response, next: NextFunction) => {
@@ -18,19 +23,23 @@ export const getCards = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
-  Card.findByIdAndDelete(req.params.id)
+  Card.findById(req.params.id)
     .then((card) => {
       if (!card) {
         return next(new NotFoundError('Запрашиваемая карточка не найдена'));
       }
-
       if (card.owner.toString() !== req.user._id) {
-        return next(new ForbiddenError('Запрашиваемую карточка удалить нельзя'));
+        return next(new ForbiddenError('Запрашиваемую карточку удалить нельзя'));
       }
-
-      return res.send({ data: card });
+      Card.findByIdAndDelete(req.params.id)
+        .then(() => res.send({ data: card }));
     })
-    .catch(() => next(new ValidationError('Не валидный id карточки')));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return next(new ValidationError('Не валидный id карточки'));
+      }
+      return next(err);
+    });
 };
 
 export const updateLike = (req: Request, res: Response, next: NextFunction) => {
