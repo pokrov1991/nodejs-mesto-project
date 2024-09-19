@@ -3,9 +3,7 @@ import { celebrate } from 'celebrate';
 import {
   createCard, getCards, deleteCard, updateLike, deleteLike,
 } from '../controllers/cards';
-import {
-  CREATE_CARD, DELETE_CARD, UPDATE_LIKE, DELETE_LIKE,
-} from '../constants/joi-schemas';
+import { CREATE_CARD, CARD_ID } from '../constants/joi-schemas';
 
 const router = Router();
 
@@ -13,10 +11,10 @@ router.post('/', celebrate(CREATE_CARD), createCard);
 
 router.get('/', getCards);
 
-router.delete('/:id', celebrate(DELETE_CARD), deleteCard);
+router.delete('/:id', celebrate(CARD_ID), deleteCard);
 
-router.put('/:id/likes', celebrate(UPDATE_LIKE), updateLike);
+router.put('/:id/likes', celebrate(CARD_ID), updateLike);
 
-router.delete('/:id/likes', celebrate(DELETE_LIKE), deleteLike);
+router.delete('/:id/likes', celebrate(CARD_ID), deleteLike);
 
 export default router;
