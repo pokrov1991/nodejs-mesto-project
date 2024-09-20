@@ -46,7 +46,7 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
       if (err.code === 11000) {
         return next(new ConflictError('Пользователь с данной почтой уже существует'));
       }
-      if (err.name === 'ValidaitonError') {
+      if (err.name === 'ValidationError') {
         return next(new ValidationError('Данные для создания пользователя неверные'));
       }
       return next(err);

@@ -9,7 +9,7 @@ export const createCard = (req: Request, res: Response, next: NextFunction) => {
   return Card.create({ name, link, owner: req.user._id })
     .then((card) => res.status(201).send({ data: card }))
     .catch((err) => {
-      if (err.name === 'ValidaitonError') {
+      if (err.name === 'ValidationError') {
         return next(new ValidationError('Данные для создания карточки неверные'));
       }
       return next(err);
