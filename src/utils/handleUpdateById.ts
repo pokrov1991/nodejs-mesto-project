@@ -23,7 +23,7 @@ export const handleUpdateById = <T extends mongoose.Document>(
       return res.send({ data });
     })
     .catch((err: { name: string; }) => {
-      if (err.name === 'ValidaitonError') {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
         return next(new ValidationError(messageError));
       }
       return next(err);
