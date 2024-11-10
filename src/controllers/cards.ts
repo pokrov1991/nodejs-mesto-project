@@ -7,7 +7,7 @@ export const createCard = (req: Request, res: Response, next: NextFunction) => {
   const { name, link } = req.body;
 
   return Card.create({ name, link, owner: req.user._id })
-    .then((card) => res.status(201).send({ data: card }))
+    .then((card) => res.status(201).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return next(new ValidationError('Данные для создания карточки неверные'));
@@ -18,7 +18,7 @@ export const createCard = (req: Request, res: Response, next: NextFunction) => {
 
 export const getCards = (req: Request, res: Response, next: NextFunction) => {
   Card.find({})
-    .then((cards) => res.send({ data: cards }))
+    .then((cards) => res.send(cards))
     .catch(next);
 };
 
@@ -32,7 +32,7 @@ export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
         return next(new ForbiddenError('Запрашиваемую карточку удалить нельзя'));
       }
       Card.findByIdAndDelete(req.params.id)
-        .then(() => res.send({ data: card }));
+        .then(() => res.send(card));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
