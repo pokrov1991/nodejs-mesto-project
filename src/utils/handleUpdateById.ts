@@ -20,7 +20,7 @@ export const handleUpdateById = <T extends mongoose.Document>(
       if (!data) {
         return next(new NotFoundError(messageNotFound));
       }
-      return res.send({ data });
+      return res.send(data);
     })
     .catch((err: { name: string; }) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {

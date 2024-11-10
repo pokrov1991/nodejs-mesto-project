@@ -7,7 +7,8 @@ require('dotenv').config();
 const { JWT_SECRET_KEY = 'nostromo' } = process.env;
 
 export default (req: Request, res: Response, next: NextFunction) => {
-  const { token } = req.cookies;
+  // Сначала ищем токен в куке потом уже в заголовке
+  const token = req.cookies.token || (req.headers.authorization && req.headers.authorization.split(' ')[1]);
 
   if (!token) {
     return next(new AuthorizationError('Необходима авторизация'));

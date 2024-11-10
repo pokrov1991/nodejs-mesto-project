@@ -11,10 +11,13 @@ import { requestLogger, errorLogger } from './middlewares/logger';
 
 require('dotenv').config();
 
+const cors = require('cors');
+
 const { PORT = 3000, MONGODB_URL = 'mongodb://localhost:27017/mestodb' } = process.env;
 
 const app = express();
 
+app.use(cors({ origin: '*', credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

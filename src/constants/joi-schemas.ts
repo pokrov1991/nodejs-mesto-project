@@ -2,7 +2,7 @@ import { Joi } from 'celebrate';
 
 const cookies = Joi.object()
   .keys({
-    token: Joi.string().required(),
+    token: Joi.string().optional(), // Изначально был обязательный required()
   })
   .unknown(true);
 const params = {

@@ -40,7 +40,7 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
     .then((user) => {
       const objUser = user.toObject();
       Reflect.deleteProperty(objUser, 'password');
-      return res.status(201).send({ data: objUser });
+      return res.status(201).send(objUser);
     })
     .catch((err) => {
       if (err.code === 11000) {
@@ -55,7 +55,7 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
 
 export const getUsers = (req: Request, res: Response, next: NextFunction) => {
   User.find({})
-    .then((users) => res.send({ data: users }))
+    .then((users) => res.send(users))
     .catch(next);
 };
 
@@ -65,7 +65,7 @@ export const getUser = (req: Request, res: Response, next: NextFunction) => {
       if (!user) {
         return next(new NotFoundError('Запрашиваемый пользователь не найден'));
       }
-      return res.send({ data: user });
+      return res.send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -81,7 +81,7 @@ export const getUserMe = (req: Request, res: Response, next: NextFunction) => {
       if (!user) {
         return next(new NotFoundError('Запрашиваемый пользователь не найден'));
       }
-      return res.send({ data: user });
+      return res.send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
