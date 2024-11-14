@@ -22,7 +22,7 @@ module.exports = {
       ref: DEPLOY_REF,
       repo: DEPLOY_REPO_BACKEND,
       path: DEPLOY_PATH_BACKEND,
-      'pre-deploy': `scp -o StrictHostKeyChecking=no ./*.env ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH_BACKEND}`,
+      'pre-deploy': `scp ./*.env ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH_BACKEND}`,
       'post-deploy': 'npm install && npm run build && pm2 reload ecosystem.config.js --env production',
       env: {
         NODE_ENV: 'production',
