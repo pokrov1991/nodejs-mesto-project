@@ -10,8 +10,8 @@
     "dev": "ts-node-dev src/app.ts",
     "start": "ts-node src/app.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy-setup": "pm2 deploy ecosystem.config.js production setup",
-    "deploy": "pm2 deploy ecosystem.config.js production"
+    "deploy-setup": "export $(cat .env.deploy | xargs) && pm2 deploy ecosystem.config.js production setup",
+    "deploy": "export $(cat .env.deploy | xargs) && pm2 deploy ecosystem.config.js production"
   },
   "author": "Pokrovski",
   "license": "ISC",
