@@ -13,4 +13,10 @@ router.post('/signin', celebrate(LOGIN), login);
 
 router.post('/signup', celebrate(CREATE_USER), createUser);
 
+router.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
+
 export default router;
